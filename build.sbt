@@ -17,6 +17,11 @@ lazy val `getvis-api` = (project in file("getvis-api"))
     )
   )
 
+val slick = Seq(
+  "com.typesafe.slick" %% "slick" % "3.3.0",
+  "org.slf4j" % "slf4j-nop" % "1.6.4",
+  "com.typesafe.slick" %% "slick-hikaricp" % "3.3.0",
+)
 
 lazy val `getvis-impl` = (project in file("getvis-impl"))
   .enablePlugins(LagomScala)
@@ -27,9 +32,10 @@ lazy val `getvis-impl` = (project in file("getvis-impl"))
       lagomScaladslTestKit,
       macwire,
       scalaTest
-    )
+    )++slick
   )
   .settings(lagomForkedTestSettings)
   .dependsOn(`getvis-api`)
+
 
 
