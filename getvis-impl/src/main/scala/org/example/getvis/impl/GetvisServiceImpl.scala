@@ -6,14 +6,14 @@ import akka.util.Timeout
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import org.example.getvis.api.GetvisService
-
+import slick.jdbc.JdbcBackend.Database
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 
 class GetvisServiceImpl(
                          clusterSharding: ClusterSharding,
-                         persistentEntityRegistry: PersistentEntityRegistry
+                         persistentEntityRegistry: PersistentEntityRegistry, db:Database
                        )(implicit ec: ExecutionContext)
   extends GetvisService {
 
@@ -32,6 +32,8 @@ class GetvisServiceImpl(
       ref
         .ask[Greeting](replyTo => Hello(id, replyTo))
         .map(greeting => greeting.message)
+
+
   }
 
 

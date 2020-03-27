@@ -11,6 +11,7 @@ import org.example.getvis.api.GetvisService
 import com.lightbend.lagom.scaladsl.broker.kafka.LagomKafkaComponents
 import com.lightbend.lagom.scaladsl.playjson.JsonSerializerRegistry
 import com.softwaremill.macwire._
+import slick.jdbc.JdbcBackend.Database
 
 class GetvisLoader extends LagomApplicationLoader {
 
@@ -44,5 +45,7 @@ abstract class GetvisApplication(context: LagomApplicationContext)
       entityContext => GetvisBehavior.create(entityContext)
     )
   )
+
+  lazy val db: Database = Database.forConfig("db.default")
 
 }
