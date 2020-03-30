@@ -1,42 +1,46 @@
 package org.example.getvis.impl
 
 import akka.NotUsed
-import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, EntityRef}
-import akka.util.Timeout
+import akka.cluster.sharding.typed.scaladsl.ClusterSharding
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import org.example.getvis.api.GetvisService
 import slick.jdbc.JdbcBackend.Database
+import slick.jdbc.PostgresProfile.api._
+import slick.lifted.Tag
+
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
 
 
 class GetvisServiceImpl(
                          clusterSharding: ClusterSharding,
-                         persistentEntityRegistry: PersistentEntityRegistry, db:Database
+                         persistentEntityRegistry: PersistentEntityRegistry, db: Database
                        )(implicit ec: ExecutionContext)
   extends GetvisService {
 
 
-  private def entityRef(id: String): EntityRef[GetvisCommand] =
-    clusterSharding.entityRefFor(GetvisState.typeKey, id)
+  override def hello(id: String): ServiceCall[NotUsed, Seq[(String, String, Int)]] = ServiceCall {
+    val file = TableQuery[File]
 
-  implicit val timeout = Timeout(5.seconds)
 
-  override def hello(id: String): ServiceCall[NotUsed, String] = ServiceCall {
     _ =>
-      // Look up the sharded entity (aka the aggregate instance) for the given ID.
-      val ref = entityRef(id)
 
-      // Ask the aggregate instance the Hello command.
-      ref
-        .ask[Greeting](replyTo => Hello(id, replyTo))
-        .map(greeting => greeting.message)
-
+      db.run(file.filter(_.name === "test").result)
 
   }
 
 
+}
+
+class File(tag: Tag) extends Table[(String, String, Int)](tag, "file") {
+  def name = column[String]("name")
+
+  def fileType = column[String]("type")
+
+  def length = column[Int]("length")
+
+  def * = (name, fileType, length)
 
 
 }
+
