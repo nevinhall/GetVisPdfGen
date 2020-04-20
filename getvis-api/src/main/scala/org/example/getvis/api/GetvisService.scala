@@ -10,7 +10,7 @@ object GetvisService  {
 trait GetvisService extends Service {
 
 
-  def hello(id: String): ServiceCall[NotUsed, Seq[(String,String,Int)]]
+  def hello(id: String): ServiceCall[NotUsed, String]
 
 
 
