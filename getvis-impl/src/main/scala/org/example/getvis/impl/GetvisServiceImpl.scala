@@ -6,6 +6,7 @@ import akka.NotUsed
 import akka.cluster.sharding.typed.scaladsl.ClusterSharding
 import akka.util.ByteString
 import com.lightbend.lagom.scaladsl.api.ServiceCall
+import com.lightbend.lagom.scaladsl.api.transport.BadRequest
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import generator.generate.Generator.convertJSONtoPDF
 import org.example.getvis.api.GetvisService
@@ -69,7 +70,12 @@ class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegist
       })
 
       val pdfFile = Paths.get("C:/Users/Nevin Hall/IdeaProjects/lagom-scala-sbt/html.pdf")
-      Future(ByteString(Files.readAllBytes(pdfFile)))
+
+      Files.exists(pdfFile) match {
+        case true => Future(ByteString(Files.readAllBytes(pdfFile)))
+        case  _ =>  throw BadRequest("No File has been Generated ")
+      }
+
 
 
 
