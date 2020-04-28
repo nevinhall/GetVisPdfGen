@@ -1,7 +1,10 @@
 package org.example.getvis.impl
 
+import java.nio.file.{Files, Paths}
+
 import akka.NotUsed
 import akka.cluster.sharding.typed.scaladsl.ClusterSharding
+import akka.util.ByteString
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import generator.generate.Generator.convertJSONtoPDF
@@ -11,7 +14,7 @@ import slick.jdbc.JdbcBackend.Database
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.Tag
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegistry: PersistentEntityRegistry, db: Database)
@@ -21,7 +24,7 @@ class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegist
   def writes(t: Seq[(String, String, Int)]): String = {
     val i = t.head._1
     val e = t.head._2
-    val h = s"$i"
+    val h = t.head._3
 
 
     s"""
@@ -39,8 +42,8 @@ class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegist
        |             "formattingID" : "list"
        |           },
        |  "webSite" : {
-       |             "fieldName" : "webSite",
-       |             "fieldValue" : "",
+       |             "fieldName" : "HELLO ",
+       |             "fieldValue" : "DOMI",
        |             "fieldType" : {
        |                               "type" : "link",
        |                               "link" : "www.growin.pt"
@@ -48,15 +51,13 @@ class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegist
        |             "formattingID" : "link"
        |           }
        |}
-      """ .stripMargin
+      """.stripMargin
 
   }
 
 
-
-
-  override def hello(id: String): ServiceCall[NotUsed, String] = ServiceCall {
-    val file = TableQuery[File]
+  override def hello(id: String): ServiceCall[NotUsed, ByteString] = ServiceCall {
+    val file = TableQuery[FileContent]
     _ =>
 
 
@@ -67,9 +68,13 @@ class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegist
         writes(x)
       })
 
+      val pdfFile = Paths.get("C:/Users/Nevin Hall/IdeaProjects/lagom-scala-sbt/html.pdf")
+      Future(ByteString(Files.readAllBytes(pdfFile)))
+
+
 
     //      val query = db.run(file.groupBy(f => f.fileType)
-    //        .map { case (fileType, group) => (fileType, group.map(_.length).avg, group.map(_.name))
+    //        .map { case (fileType, group) => (fileType, group.map(_.length).avg, group.map( .name))
     //        }.result)
 
     //      db.run(file.groupBy(p => p.fileType)
@@ -82,7 +87,7 @@ class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegist
 }
 
 
-class File(tag: Tag) extends Table[(String, String, Int)](tag, "file") {
+class FileContent(tag: Tag) extends Table[(String, String, Int)](tag, "file") {
   def name = column[String]("name")
 
   def fileType = column[String]("type")
