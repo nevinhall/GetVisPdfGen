@@ -16,15 +16,12 @@ trait GetvisService extends Service {
 
 
 
-
-
-
   override final def descriptor: Descriptor = {
     import Service._
     // @formatter:off
     named("getvis")
       .withCalls(
-        pathCall("/report/:id", hello _)(
+        pathCall("/report/:id", generatePdf _)(
           requestSerializer = implicitly[MessageSerializer[NotUsed, ByteString]],
           responseSerializer = new ByteStringMessageSerializer)
       )
@@ -36,7 +33,7 @@ trait GetvisService extends Service {
     // @formatter:on
   }
 
-  def hello(id: String): ServiceCall[NotUsed, ByteString]
+  def generatePdf(id: String): ServiceCall[NotUsed, ByteString]
 }
 
 

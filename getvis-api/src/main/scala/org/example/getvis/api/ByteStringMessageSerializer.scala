@@ -8,6 +8,9 @@ package org.example.getvis.api
 
   import scala.collection.immutable
 
+/**
+  * Serializer to ensure pdf is returned
+  */
   class ByteStringMessageSerializer extends StrictMessageSerializer[ByteString] {
 
     private final val serialiser: NegotiatedSerializer[ByteString, ByteString] =

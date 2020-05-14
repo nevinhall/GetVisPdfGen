@@ -21,7 +21,7 @@ class GetvisServiceSpec extends AsyncWordSpec with Matchers with BeforeAndAfterA
   "GetVis service" should {
 
     "say hello" in {
-      client.hello("Alice").invoke().map { answer =>
+      client.generatePdf("Alice").invoke().map { answer =>
         answer should ===("Hello, Alice!")
       }
     }
