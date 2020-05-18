@@ -12,7 +12,6 @@ import generator.generate.Generator.convertJSONtoPDF
 import org.example.getvis.api.GetvisService
 import slick.jdbc.JdbcBackend.Database
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.Tag
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,18 +28,30 @@ class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegist
     val seqLen = t.length
 
     val result = t.take(seqLen)
-    val x = result.toString().replaceAll("[(())]", "\r\n" )
+    val x = result.mkString(" ").replaceAll("[(())]", " " )
+
+    val result1 = t.filter(_._2.contains(t.head._2)).toString().replaceAll("[(())]", "" )
+    val result2 = t.filterNot(_._2.contains(t.last._2 )).filterNot(_._2.contains(t.head._2 )).toString().replaceAll("[(())]", "" )
+    val result3 = t.filter(_._2.contains(t.last._2)).toString().replaceAll("[(())]", "" )
+
+
+
+
+
+
 
 
     s"""
        |{
        |
-       |  "phones" : {
+       |  "DB results" : {
        |             "fieldName" : "Results",
-       |             "fieldValue" : ["$x"],
-       |             "fieldType" : "UnorderedList",
-       |             "formattingID" : "list"
+       |             "fieldValue" : ["$result1","*","$result2","*","$result3","*","This is the orgianl ordered query
+       |             as you can see it is difficult to read however it is ordered by file type and length ","*", "$x"],
+       |             "fieldType" : "Table",
        |           }
+       |
+       |
        |
        |
        |
@@ -81,17 +92,5 @@ class GetvisServiceImpl(clusterSharding: ClusterSharding, persistentEntityRegist
 
 }
 
-/**
-  * Define columns in database base table
-  */
-class FileContent(tag: Tag) extends Table[(String, String, Int)](tag, "file") {
-  def name = column[String]("name")
-
-  def fileType = column[String]("type")
-
-  def length = column[Int]("length")
-
-  def * = (name, fileType, length)
-}
 
 
